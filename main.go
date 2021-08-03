@@ -9,6 +9,10 @@ import (
 )
 
 func main() {
+	if runtime.GOOS == "windows" {
+		fmt.Println("This program only works on linux!!")
+		return
+	}
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: %s FILE OUT\n",os.Args[0])
 		return
@@ -59,10 +63,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	if runtime.GOOS == "windows" {
-		fmt.Println("This program only works on linux!!")
-		return
-	}
+	
 	_,err = exec.Command("gcc", "-O2","-o", os.Args[2], "/tmp/brainfuck.c").Output()
 	if err != nil {
 		fmt.Printf("%s", err)
