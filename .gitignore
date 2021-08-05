@@ -1,6 +1,9 @@
 # Ignore all
 *
 
+# Ignore object files
+*.o
+
 # Unignore all with extensions
 !*.*
 

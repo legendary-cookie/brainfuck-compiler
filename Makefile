@@ -21,3 +21,7 @@ caesar-cipher: examples/caesar-cipher.b brainfuck-compiler
 clean:
 	find . -maxdepth 1 -type f -perm -100 -delete
 	find . -type f -name "*.o" -delete
+
+
+%.o: %.b
+	./brainfuck-compiler -c -i $< -o $@
