@@ -41,14 +41,43 @@ func main() {
 		return
 	}
 	s := string(bytes)
+	cstring += getC(s)
+	cstring += "}"
+	brainPath := "/tmp/brainfuck.c"
+	err = ioutil.WriteFile(brainPath, []byte(cstring), 0644)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if *cFlag {
+		if *oFlag == "a.out" {
+			tmp := strings.TrimSuffix(*iFlag, ".b")
+			*oFlag = tmp + ".o"
+		}
+		_, err = exec.Command("gcc", "-c", "-o", *oFlag, "-O2", brainPath).Output()
+	} else {
+		_, err = exec.Command("gcc", "-o", *oFlag, "-O2", brainPath).Output()
+	}
+	if err != nil {
+		fmt.Printf("%s", err)
+		return
+	}
+	exec.Command("strip", *oFlag)
+	err = os.Remove(brainPath)
+	if err != nil {
+		fmt.Printf("%s", err)
+		return
+	}
+}
+
+func getC(s string) string {
+	cstring := ""
 	for _, char := range s {
 		switch char {
 		case '>':
 			cstring += "++ptr;"
-
 		case '<':
 			cstring += "--ptr;"
-
 		case '+':
 			cstring += "++*ptr;"
 
@@ -69,31 +98,5 @@ func main() {
 
 		}
 	}
-	cstring += "}"
-	brainPath := "/tmp/brainfuck.c"
-	err = ioutil.WriteFile(brainPath, []byte(cstring), 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	if *cFlag {
-		if *oFlag == "a.out" {
-			tmp := strings.TrimSuffix(*iFlag, ".b")
-			*oFlag = tmp + ".o"
-		}
-		_, err = exec.Command("gcc", "-c", "-o", *oFlag, "-O2", brainPath).Output()
-	} else {
-		_, err = exec.Command("gcc", "-o", *oFlag, "-O2", brainPath).Output()
-	}
-	if err != nil {
-		fmt.Printf("%s", err)
-		return
-	}
-	exec.Command("strip", *oFlag)
-	err = os.Remove(brainPath)
-	if err != nil {
-		fmt.Printf("%s", err)
-		return
-	}
+	return cstring
 }
