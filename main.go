@@ -10,8 +10,7 @@ import (
 	"strings"
 )
 
-var Version="development"
-
+var Version = "development"
 
 func main() {
 	if runtime.GOOS == "windows" {
@@ -28,14 +27,14 @@ func main() {
 		return
 	}
 	if *iFlag == "" {
-		fmt.Println("Usage: %s [-i inpath] {-o outpath}", os.Args[0])
+		fmt.Printf("Usage: %s [-i inpath] {-o outpath}", os.Args[0])
 		return
 	}
 	file := *iFlag
 	cstring := ""
 	cstring += "#include<stdio.h>\n"
 	cstring += "int main() {char array[65535];char*ptr=array;"
-	
+
 	bytes, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Println(err)
@@ -43,49 +42,49 @@ func main() {
 	}
 	s := string(bytes)
 	for _, char := range s {
-		switch(char) {
+		switch char {
 		case '>':
 			cstring += "++ptr;"
-			break
+
 		case '<':
 			cstring += "--ptr;"
-			break
+
 		case '+':
 			cstring += "++*ptr;"
-			break
+
 		case '-':
 			cstring += "--*ptr;"
-			break
+
 		case '.':
 			cstring += "putchar(*ptr);"
-			break
+
 		case ',':
 			cstring += "*ptr = getchar();"
-			break
+
 		case '[':
 			cstring += "while (*ptr) {"
-			break
+
 		case ']':
 			cstring += "}"
-			break
+
 		}
 	}
 	cstring += "}"
 	brainPath := "/tmp/brainfuck.c"
-	err = ioutil.WriteFile(brainPath,[]byte(cstring),0644)
+	err = ioutil.WriteFile(brainPath, []byte(cstring), 0644)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	if *cFlag{
+	if *cFlag {
 		if *oFlag == "a.out" {
 			tmp := strings.TrimSuffix(*iFlag, ".b")
-			*oFlag = tmp+".o"
+			*oFlag = tmp + ".o"
 		}
-		_,err = exec.Command("gcc", "-c", "-o", *oFlag, "-O2",brainPath).Output()
+		_, err = exec.Command("gcc", "-c", "-o", *oFlag, "-O2", brainPath).Output()
 	} else {
-		_,err = exec.Command("gcc", "-o", *oFlag, "-O2",brainPath).Output()
+		_, err = exec.Command("gcc", "-o", *oFlag, "-O2", brainPath).Output()
 	}
 	if err != nil {
 		fmt.Printf("%s", err)
@@ -94,7 +93,7 @@ func main() {
 	exec.Command("strip", *oFlag)
 	err = os.Remove(brainPath)
 	if err != nil {
-		fmt.Printf("%s",err)
+		fmt.Printf("%s", err)
 		return
 	}
 }
