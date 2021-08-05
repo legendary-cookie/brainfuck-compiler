@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -31,6 +32,7 @@ func main() {
 		return
 	}
 	file := *iFlag
+	preProcess(file)
 	cstring := ""
 	cstring += "#include<stdio.h>\n"
 	cstring += "int main() {char array[65535];char*ptr=array;"
@@ -99,4 +101,24 @@ func getC(s string) string {
 		}
 	}
 	return cstring
+}
+
+func preProcess(filePath string) *string {
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Printf("%s", err)
+		return nil
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if !strings.HasPrefix("@", scanner.Text()) {
+			continue
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Printf("%s", err)
+		return nil
+	}
+	return nil
 }
