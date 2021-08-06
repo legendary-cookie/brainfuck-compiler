@@ -115,6 +115,7 @@ func preProcess(filePath string) *string {
 		if !strings.HasPrefix("@", scanner.Text()) {
 			continue
 		}
+
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Printf("%s", err)
