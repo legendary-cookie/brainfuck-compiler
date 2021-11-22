@@ -19,9 +19,10 @@ func main() {
 		return
 	}
 	vFlag := flag.Bool("v", false, "print version")
-	cFlag := flag.Bool("c", false, "only assemble")
+	cFlag := flag.Bool("c", false, "only assemble [to object file]")
 	oFlag := flag.String("o", "a.out", "output path")
 	iFlag := flag.String("i", "", "input path")
+	dFlag := flag.Bool("d", false, "don't remove the C source file")
 	flag.Parse()
 	if *vFlag {
 		fmt.Println("Version: ", Version)
@@ -51,24 +52,27 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	compiler := getEnv("CC", "gcc")
 	if *cFlag {
 		if *oFlag == "a.out" {
 			tmp := strings.TrimSuffix(*iFlag, ".b")
 			*oFlag = tmp + ".o"
 		}
-		_, err = exec.Command("gcc", "-c", "-o", *oFlag, "-O2", brainPath).Output()
+		_, err = exec.Command(compiler, "-c", "-o", *oFlag, "-O2", brainPath).Output()
 	} else {
-		_, err = exec.Command("gcc", "-o", *oFlag, "-O2", brainPath).Output()
+		_, err = exec.Command(compiler, "-o", *oFlag, "-O2", brainPath).Output()
 	}
 	if err != nil {
 		fmt.Printf("%s", err)
 		return
 	}
 	exec.Command("strip", *oFlag)
-	err = os.Remove(brainPath)
-	if err != nil {
-		fmt.Printf("%s", err)
-		return
+	if !*dFlag {
+		err = os.Remove(brainPath)
+		if err != nil {
+			fmt.Printf("%s", err)
+			return
+		}
 	}
 }
 
@@ -123,3 +127,11 @@ func preProcess(filePath string) *string {
 	}
 	return nil
 }
+
+func getEnv(key, fallback string) string {
+    if value, ok := os.LookupEnv(key); ok {
+        return value
+    }
+    return fallback
+}
+
