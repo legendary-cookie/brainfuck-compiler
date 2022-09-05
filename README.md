@@ -16,6 +16,3 @@ The C code will have a ```char array[65535] = {0}; char *ptr = array;``` at the 
 |,        |*ptr = getchar();|
 |[        |while (*ptr) {|
 |]        |}|
-
-## Plans
-* Allow calling C functions in brainfuck (Maybe with :\<function\>:)
